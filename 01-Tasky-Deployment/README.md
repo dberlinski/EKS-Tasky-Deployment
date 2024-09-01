@@ -4,6 +4,8 @@ Tasky is a todo list application written with Go.
 
 This project deploys Tasky in a lab environment prepared on AWS EKS. It uses a MongoDB back-end which is deployed on AWS EC2.
 
+The kube-manifests folder contains the yaml files used to deploy Tasky on EKS. The deployment runs a single pod and a service of type LoadBalancer exposes Tasky to the Internet.
+
 ## Docker
 A Dockerfile has been provided to run this application.  The default port exposed is 8080.
 
