@@ -23,6 +23,97 @@ net:
   port: 27017
   bindIp: 0.0.0.0  # Enter 0.0.0.0,:: to bind to all IPv4 and IPv6 addresses or, alternatively, use the net.bindIpAll setting.
 ```
+MongoDB accepts connections on TCP port 27017. The instance Security group was edited to accept traffic bound for TCP port 27017. 
+
+## MongoDB EC2 Instance Profile configuration
+
+The MongoDB database server will need permissions to copy its backup data to S3. The following configuration steps use the AWS CLI to create the required IAM role, policy, and instance profile that will be attached to the instance.
+
+1. Trust policy definition. The ec2-trustpolicy-mongodb.json file is created.
+```sh
+cat >> ec2-trustpolicy-mongodb.json << EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sts:AssumeRole"
+            ],
+            "Principal": {
+                "Service": [
+                    "ec2.amazonaws.com"
+                ]
+            }
+        }
+    ]
+}
+EOF
+
+2. IAM role creation.
+```
+aws iam create-role --role-name db-ec2-role-mongodb-ekslab --assume-role-policy-document file://ec2-trustpolicy-mongodb.json
+```
+
+3. IAM inline policy document creation.  The following policy document grants access to S3 and EC2.
+```sh
+cat >> ec2-policy-mongodb.json << EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListAccessPointsForObjectLambda",
+                "s3:GetAccessPoint",
+                "s3:PutAccountPublicAccessBlock",
+                "s3:ListAccessPoints",
+                "s3:ListJobs",
+                "s3:CreateStorageLensGroup",
+                "s3:PutStorageLensConfiguration",
+                "s3:ListMultiRegionAccessPoints",
+                "s3:ListStorageLensGroups",
+                "s3:ListStorageLensConfigurations",
+                "s3:GetAccountPublicAccessBlock",
+                "s3:ListAllMyBuckets",
+                "s3:ListAccessGrantsInstances",
+                "s3:PutAccessPointPublicAccessBlock",
+                "ec2:*",
+                "s3:CreateJob"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::*"
+        }
+    ]
+}
+EOF
+```
+
+4. Add the inline policy to the IAM role.
+```
+aws iam put-role-policy --role-name db-ec2-role-mongodb-ekslab --policy-name db-ec2-policy-mongodb-ekslab --policy-document file://ec2-policy-mongodb.json
+```
+
+5. Create the IAM instance profile.
+```
+aws iam create-instance-profile --instance-profile-name ec2-mongodb-ekslab
+```
+
+6. Add the IAM role to the instance profile.
+```
+aws iam add-role-to-instance-profile --instance-profile-name ec2-mongodb-ekslab --role-name db-ec2-role-mongodb-ekslab
+```
+
+7. Finally, attach the instance profile to the ec2 instance running MongoDB.
+```
+aws ec2 associate-iam-instance-profile --iam-instance-profile Name=ec2-mongodb-ekslab --instance-id <instance-id>
+```
 
 ## MongoDB Authentication and Authorization notes
 
