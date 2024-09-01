@@ -24,7 +24,7 @@ net:
   bindIp: 0.0.0.0  # Enter 0.0.0.0,:: to bind to all IPv4 and IPv6 addresses or, alternatively, use the net.bindIpAll setting.
 ```
 
-##MongoDB Authentication and Authorization notes
+## MongoDB Authentication and Authorization notes
 
 1- In the MongoDB instance, issue:
 ```sh
