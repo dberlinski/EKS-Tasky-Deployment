@@ -1,4 +1,4 @@
-#**MongoDB installation on Amazon Linux 2023**
+# **MongoDB installation on Amazon Linux 2023**
 
 1. Launch Amazon Linux 2023
 2. Create a /etc/yum.repos.d/mongodb-org-7.0.repo file so that you can install MongoDB directly using dnf:
@@ -22,6 +22,7 @@ Edit the /etc/mongod.conf file and look for the following lines.
 net:
   port: 27017
   bindIp: 0.0.0.0  # Enter 0.0.0.0,:: to bind to all IPv4 and IPv6 addresses or, alternatively, use the net.bindIpAll setting.
+```
 
 ##MongoDB Authentication and Authorization notes
 
