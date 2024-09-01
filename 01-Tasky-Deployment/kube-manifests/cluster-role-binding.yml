@@ -1,0 +1,16 @@
+# Associate the cluster role with the service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tasky-deployer
+  # make sure NOT to mention 'namespace' here or
+  # the permissions will only have effect in the
+  # given namespace
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: tasky-deployer
+  namespace: default
