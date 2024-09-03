@@ -49,7 +49,7 @@ cat >> ec2-trustpolicy-mongodb.json << EOF
     ]
 }
 EOF
-
+```
 2. IAM role creation.
 ```
 aws iam create-role --role-name db-ec2-role-mongodb-ekslab --assume-role-policy-document file://ec2-trustpolicy-mongodb.json
